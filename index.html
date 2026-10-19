@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WebAR Sistem Ekskresi Manusia</title>
+<style>
+:root{--bg:#eef3f1;--ink:#17302b;--mut:#587068;--pri:#0f766e;--pri2:#0b5a54;--acc:#e8a317;--card:#fff;--line:#d3e0db;--viz:#0e2a28}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;line-height:1.5}
+header{background:var(--pri2);color:#fff;padding:10px 18px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+header h1{font-size:1.15rem;margin:0}header span{font-size:.85rem;opacity:.8}
+main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#lkpd{overflow-y:auto;padding:16px 20px 40px;border-right:1px solid var(--line)}
+#arpanel{display:flex;flex-direction:column;background:var(--viz);color:#e8f5f2;min-height:0;overflow-y:auto}
+h2{font-size:1.05rem;margin:22px 0 6px;color:var(--pri2);border-bottom:2px solid var(--line);padding-bottom:3px}
+h3{font-size:.95rem;margin:12px 0 4px}
+p,li{font-size:.92rem}ul,ol{padding-left:20px;margin:4px 0}
+label{font-size:.85rem;color:var(--mut)}
+input[type=text],textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font:inherit;font-size:.9rem;background:#fff;color:var(--ink)}
+textarea{min-height:70px;resize:vertical}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+button{font:inherit;font-size:.85rem;cursor:pointer;border:0;border-radius:8px;padding:7px 12px;background:var(--pri);color:#fff}
+button:hover{background:var(--pri2)}
+button.sec{background:#e3ece9;color:var(--ink)}button.sec:hover{background:#d3e0db}
+button.on{background:var(--acc);color:#2a1d00}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+button:disabled{opacity:.55;cursor:not-allowed}
+.bar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+td,th{border:1px solid var(--line);padding:4px;vertical-align:top;background:#fff}
+th{background:#e3ece9;text-align:left}
+td input{border:0;padding:4px;width:100%;font-size:.82rem;background:transparent}
+.fb{font-size:.85rem;margin-top:5px;padding:6px 9px;border-radius:8px;display:none}
+.fb.ok{display:block;background:#dcf5e6;color:#0b5a2c}.fb.mid{display:block;background:#fff3d1;color:#6b4a00}.fb.no{display:block;background:#fde2e0;color:#7a1b14}
+.q{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:8px 0}
+.q label{display:block;color:var(--ink);padding:2px 0;cursor:pointer}
+#stage{position:relative;height:50vh;min-height:300px;flex:none;background:radial-gradient(circle at 50% 40%,#1c4a46,#0a1f1d)}
+#cv{position:absolute;inset:0}#cv canvas{display:block;width:100%;height:100%;touch-action:none}
+.lb{position:absolute;transform:translate(-50%,-100%);background:rgba(255,255,255,.92);color:#17302b;font-size:.72rem;padding:1px 6px;border-radius:6px;pointer-events:none;white-space:nowrap;border:1px solid var(--acc)}
+.warn{padding:20px;color:#ffd7d2}
+#ctl{padding:10px 14px 20px}
+#ctl h3{color:#9be3d8;margin:10px 0 4px}
+#ctl button.sec{background:#1f4a46;color:#e8f5f2}#ctl button.sec:hover{background:#2a5d58}#ctl button.on{background:var(--acc);color:#2a1d00}
+#info{background:#123a36;border-radius:10px;padding:10px 12px;font-size:.88rem}
+#info b{color:#ffd37a}
+#hasil{margin-top:8px;background:#0a1f1d;border:1px dashed #3f7a73;border-radius:10px;padding:8px 12px;font-size:.85rem}
+input[type=range]{width:150px;vertical-align:middle}
+.inar #arpanel{background:transparent}.inar header,.inar #lkpd{display:none}
+@media(max-width:860px){body{height:auto}main{display:flex;flex-direction:column}#arpanel{order:-1}#lkpd{overflow:visible;border-right:0}#stage{height:55vh}.row{grid-template-columns:1fr}}
+@media print{header,#arpanel,.noprint{display:none!important}main{display:block}#lkpd{overflow:visible}body{background:#fff}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header><h1>WebAR Sistem Ekskresi Manusia</h1><span>Media pembelajaran Biologi SMA &middot; LKPD inkuiri digital</span></header>
+<main>
+<section id="lkpd">
+<h2 style="margin-top:4px">LKPD Digital: Sistem Ekskresi Manusia</h2>
+<div class="row"><div><label for="nm">Nama</label><input type="text" id="nm"></div><div><label for="kl">Kelas</label><input type="text" id="kl"></div><div><label for="kg">Kelompok</label><input type="text" id="kg"></div></div>
+
+<h2>Tujuan Pembelajaran</h2>
+<ol><li>Mengidentifikasi organ ekskresi (ginjal, kulit, paru-paru, hati) beserta zat sisa yang dikeluarkan.</li>
+<li>Menjelaskan proses pembentukan urine: filtrasi, reabsorpsi, dan sekresi (augmentasi).</li>
+<li>Menganalisis hubungan sebab-akibat gangguan reabsorpsi dan aktivitas tubuh terhadap urine.</li></ol>
+
+<h2>Petunjuk Kegiatan</h2>
+<ol><li>Pilih organ pada panel visualisasi, lalu putar model dengan menggeser layar atau tombol putar.</li>
+<li>Pilih <b>Nefron</b>, jalankan simulasi, dan klik tahapan Filtrasi, Reabsorpsi, Sekresi.</li>
+<li>Isi tabel pengamatan, jawab pertanyaan analisis, lalu klik <b>Periksa Jawaban</b>.</li>
+<li>Di ponsel yang mendukung AR, tekan <b>Mulai AR</b> dan izinkan kamera.</li></ol>
+
+<h2>Orientasi Masalah</h2>
+<p>Dina berolahraga di bawah terik matahari dan hanya minum sedikit. Sore harinya urine Dina berwarna kuning pekat dan jumlahnya sedikit. Keesokan harinya, setelah banyak minum, urinenya jernih dan banyak. Bagaimana tubuh Dina mengatur hal ini?</p>
+
+<h2>Kegiatan Pengamatan</h2>
+<p>Pilih satu tahapan pada simulasi nefron, lalu klik tombol di bawah untuk mengisi baris tabel yang sesuai. Lengkapi kolom yang masih kosong dengan kata-katamu sendiri.</p>
+<div class="bar noprint"><button id="fill">Isi baris dari simulasi</button></div>
+<table><tr><th>Tahapan</th><th>Lokasi</th><th>Zat yang terlibat</th><th>Hasil</th></tr>
+<tr><td>Filtrasi</td><td><input id="l_filtrasi"></td><td><input id="z_filtrasi"></td><td><input id="h_filtrasi"></td></tr>
+<tr><td>Reabsorpsi</td><td><input id="l_reabsorpsi"></td><td><input id="z_reabsorpsi"></td><td><input id="h_reabsorpsi"></td></tr>
+<tr><td>Sekresi</td><td><input id="l_sekresi"></td><td><input id="z_sekresi"></td><td><input id="h_sekresi"></td></tr></table>
+<h3>Pengamatan organ lain (kulit, paru-paru, hati)</h3>
+<textarea id="orgobs" placeholder="Tuliskan zat sisa yang kamu amati keluar dari tiap organ."></textarea>
+<h3>Percobaan: Aktifkan &ldquo;Gangguan reabsorpsi&rdquo; pada simulasi nefron</h3>
+<textarea id="exp" placeholder="Apa perbedaan jumlah partikel di tubulus pengumpul sebelum dan sesudah gangguan diaktifkan?"></textarea>
+
+<h2>Pertanyaan Analisis</h2>
+<div id="qa"></div>
+<div class="bar noprint"><button id="chk">Periksa Jawaban</button><button class="sec" id="rst">Ulangi Kegiatan</button><button class="sec" id="prt">Cetak / Simpan PDF</button></div>
+
+<h2>Kesimpulan</h2>
+<textarea id="kes" placeholder="Tulis kesimpulanmu tentang cara kerja sistem ekskresi, terutama pembentukan urine."></textarea>
+
+<h2>Kuis Singkat</h2>
+<div id="quiz"></div>
+<div class="bar noprint"><button id="qchk">Periksa Kuis</button></div>
+<div id="qres" class="fb"></div>
+</section>
+
+<section id="arpanel">
+<div id="stage"><div id="cv"></div></div>
+<div id="ctl">
+<h3>Pilih organ</h3>
+<div class="bar" id="organs">
+<button class="sec on" data-o="ginjal">🫘 Ginjal</button><button class="sec" data-o="nefron">🔬 Nefron</button><button class="sec" data-o="kulit">💧 Kulit</button><button class="sec" data-o="paru">🫁 Paru-paru</button><button class="sec" data-o="hati">Hati</button></div>
+<h3>Tampilan</h3>
+<div class="bar">
+<button class="sec" id="rl">⟲ Putar</button><button class="sec" id="rr">⟳ Putar</button><button class="sec" id="zi">＋ Perbesar</button><button class="sec" id="zo">－ Perkecil</button>
+<button class="sec on" id="auto">Putar otomatis</button><button class="sec on" id="lab">Label</button><button class="sec" id="rv">Reset tampilan</button></div>
+<div class="bar"><button id="ar">Mulai AR</button><span id="arm" style="font-size:.8rem;color:#9be3d8;align-self:center"></span></div>
+<h3>Simulasi</h3>
+<div class="bar"><button id="play">⏸ Jeda</button><button class="sec" id="rep">↺ Ulangi</button>
+<label style="color:#e8f5f2">Kecepatan <input type="range" id="spd" min="0.2" max="3" step="0.1" value="1"> <b id="spv">1.0×</b></label></div>
+<div id="stgbar" class="bar">
+<button class="sec" data-s="filtrasi">1. Filtrasi</button><button class="sec" data-s="reabsorpsi">2. Reabsorpsi</button><button class="sec" data-s="sekresi">3. Sekresi</button>
+<label style="color:#e8f5f2"><input type="checkbox" id="imp"> Gangguan reabsorpsi</label></div>
+<div id="info"></div>
+<div id="hasil"></div>
+</div>
+</section>
+</main>
+
+<script>
+/* ===== Data & LKPD (tidak bergantung pada Three.js) ===== */
+var $=function(s){return document.querySelector(s)};
+var INFO={
+ginjal:{n:'Ginjal',s:'Korteks (bagian luar), medula berisi piramid ginjal, pelvis renalis, dan jutaan nefron.',f:'Menyaring darah dan membentuk urine, menjaga keseimbangan air, garam, dan pH.',z:'Urea, asam urat, kreatinin, kelebihan air dan garam mineral.',p:'Darah masuk lewat arteri renalis, difiltrasi di nefron, urine dialirkan melalui pelvis renalis ke ureter menuju kandung kemih.'},
+nefron:{n:'Nefron',s:'Glomerulus, kapsula Bowman, tubulus kontortus proksimal, lengkung Henle, tubulus kontortus distal, tubulus pengumpul.',f:'Unit fungsional ginjal pembentuk urine.',z:'Urea, kreatinin, ion berlebih, obat-obatan.',p:'Pilih tahapan Filtrasi, Reabsorpsi, atau Sekresi untuk melihat lokasi, zat, dan hasilnya.'},
+kulit:{n:'Kulit',s:'Epidermis, dermis, hipodermis, kelenjar keringat (glandula sudorifera), saluran dan pori keringat.',f:'Mengeluarkan keringat dan membantu mengatur suhu tubuh.',z:'Air, garam (NaCl), sedikit urea.',p:'Kelenjar keringat menyerap bahan dari pembuluh darah, keringat naik melalui saluran dan keluar lewat pori.'},
+paru:{n:'Paru-paru',s:'Trakea, bronkus, bronkiolus, alveolus yang dikelilingi kapiler darah.',f:'Pertukaran gas dan ekskresi gas sisa respirasi seluler.',z:'Karbon dioksida (CO\u2082) dan uap air (H\u2082O).',p:'CO\u2082 dari darah berdifusi ke alveolus, lalu dikeluarkan saat ekspirasi bersama uap air.'},
+hati:{n:'Hati',s:'Lobus kanan, lobus kiri, vena porta hepatika, vena hepatika, kantung empedu.',f:'Mengolah zat sisa metabolisme, membentuk urea, dan menguraikan sel darah merah.',z:'Urea (dari amonia), empedu (bilirubin), zat racun yang dinetralkan.',p:'Deaminasi asam amino menghasilkan amonia yang beracun, diubah hati menjadi urea lalu dibawa darah ke ginjal.'}};
+var STG={
+filtrasi:{t:'Filtrasi',l:'Glomerulus dan kapsula Bowman (korteks ginjal)',z:'Air, glukosa, asam amino, garam, urea. Protein dan sel darah tidak lolos.',h:'Urine primer (filtrat glomerulus), \u00b1180 L/hari.'},
+reabsorpsi:{t:'Reabsorpsi',l:'Tubulus kontortus proksimal, lengkung Henle, tubulus pengumpul',z:'Glukosa, asam amino, ion Na\u207a, dan air diserap kembali ke darah.',h:'Urine sekunder yang lebih pekat; \u00b199% filtrat diserap kembali.'},
+sekresi:{t:'Sekresi (augmentasi)',l:'Tubulus kontortus distal',z:'Ion H\u207a, K\u207a, amonia, obat dan zat sisa ditambahkan ke tubulus.',h:'Urine sesungguhnya, \u00b11,5 L/hari, dialirkan ke pelvis renalis.'}};
+var APP={organ:'ginjal',stage:null};
+
+var QA=[
+{q:'1. Mengapa warna dan konsentrasi urine seseorang dapat berubah? Hubungkan dengan jumlah air yang diminum.',m:[['air','cairan'],['pekat','encer','konsentrasi'],['adh','hormon','dehidrasi','minum','reabsorpsi']],h:'Sebutkan peran air, tingkat kepekatan urine, dan hormon ADH/reabsorpsi air.'},
+{q:'2. Jelaskan bagaimana ginjal menyaring darah dan menghasilkan urine primer.',m:[['glomerulus'],['kapsula','bowman'],['tekanan','filtrat','urine primer','protein']],h:'Sebutkan glomerulus, kapsula Bowman, tekanan darah, dan zat yang tidak tersaring.'},
+{q:'3. Apa yang terjadi jika reabsorpsi terganggu? Gunakan hasil percobaan pada simulasi.',m:[['glukosa','air','zat'],['urine','banyak','volume','encer'],['dehidrasi','diabetes','keluar','terbuang','hilang']],h:'Jelaskan zat yang ikut terbuang, volume urine, dan dampaknya bagi tubuh.'},
+{q:'4. Bagaimana hubungan aktivitas tubuh, pengeluaran keringat, dan kerja ginjal?',m:[['keringat'],['air','cairan'],['urine','sedikit','pekat','ginjal','adh']],h:'Hubungkan keringat berlebih dengan kehilangan air dan urine yang lebih pekat.'}];
+var QZ=[
+{q:'Proses penyaringan darah di glomerulus disebut...',o:['Reabsorpsi','Filtrasi','Sekresi','Ekskresi'],a:1,e:'Filtrasi terjadi di glomerulus dan kapsula Bowman.'},
+{q:'Zat yang diserap kembali di tubulus proksimal adalah...',o:['Urea','Kreatinin','Glukosa','Obat-obatan'],a:2,e:'Glukosa diserap kembali hampir seluruhnya.'},
+{q:'Hati membentuk urea dari...',o:['Amonia','Glukosa','Lemak','Oksigen'],a:0,e:'Amonia hasil deaminasi diubah menjadi urea.'},
+{q:'Paru-paru mengeluarkan zat sisa berupa...',o:['Urea dan garam','CO\u2082 dan uap air','Bilirubin','Asam urat'],a:1,e:'Paru-paru melepas CO\u2082 dan uap air.'},
+{q:'Urine sesungguhnya terbentuk setelah tahap...',o:['Filtrasi saja','Reabsorpsi saja','Filtrasi, reabsorpsi, dan sekresi','Difusi di alveolus'],a:2,e:'Urine terbentuk setelah ketiga tahap tuntas.'}];
+
+function build(){
+ $('#qa').innerHTML=QA.map(function(x,i){return '<div class="q"><b style="font-size:.9rem">'+x.q+'</b><textarea id="a'+i+'" placeholder="Tulis jawabanmu di sini"></textarea><div class="fb" id="fa'+i+'"></div></div>'}).join('');
+ $('#quiz').innerHTML=QZ.map(function(x,i){return '<div class="q"><b style="font-size:.9rem">'+(i+1)+'. '+x.q+'</b>'+x.o.map(function(o,j){return '<label><input type="radio" name="z'+i+'" value="'+j+'"> '+o+'</label>'}).join('')+'<div class="fb" id="fz'+i+'"></div></div>'}).join('');
+}
+build();
+$('#fill').onclick=function(){
+ var s=APP.stage;
+ if(!s){alert('Pilih dulu tahapan (Filtrasi, Reabsorpsi, atau Sekresi) pada simulasi nefron.');return}
+ $('#l_'+s).value=STG[s].l;$('#z_'+s).value=STG[s].z;$('#h_'+s).value=STG[s].h;
+};
+$('#chk').onclick=function(){
+ QA.forEach(function(x,i){
+  var v=$('#a'+i).value.toLowerCase().trim(),f=$('#fa'+i);
+  if(!v){f.className='fb no';f.textContent='Jawaban masih kosong. Isi dulu ya.';return}
+  var n=x.m.filter(function(g){return g.some(function(k){return v.indexOf(k)>-1})}).length;
+  if(n===x.m.length){f.className='fb ok';f.textContent='Bagus! Jawabanmu sudah memuat konsep-konsep kunci.'}
+  else if(n>0){f.className='fb mid';f.textContent='Sebagian sudah tepat ('+n+' dari '+x.m.length+' konsep). Petunjuk: '+x.h}
+  else{f.className='fb no';f.textContent='Belum tepat. Amati kembali simulasi. Petunjuk: '+x.h}
+ });
+};
+$('#rst').onclick=function(){
+ if(!confirm('Semua isian akan dihapus. Lanjutkan?'))return;
+ document.querySelectorAll('#lkpd input,#lkpd textarea').forEach(function(e){if(e.type==='radio')e.checked=false;else e.value=''});
+ document.querySelectorAll('.fb').forEach(function(e){e.className='fb';e.textContent=''});
+};
+$('#prt').onclick=function(){window.print()};
+$('#qchk').onclick=function(){
+ var sc=0,done=0;
+ QZ.forEach(function(x,i){
+  var c=document.querySelector('input[name=z'+i+']:checked'),f=$('#fz'+i);
+  if(!c){f.className='fb no';f.textContent='Belum dijawab.';return}
+  done++;
+  if(+c.value===x.a){sc++;f.className='fb ok';f.textContent='Benar! '+x.e}
+  else{f.className='fb no';f.textContent='Kurang tepat. '+x.e}
+ });
+ var r=$('#qres');r.className='fb '+(sc>=4?'ok':sc>=3?'mid':'no');
+ r.textContent='Skor: '+sc+' dari '+QZ.length+' ('+done+' soal terjawab). '+(sc>=4?'Hebat!':'Pelajari lagi simulasinya, lalu coba ulang.');
+};
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ===== Visualisasi 3D & WebAR ===== */
+(function(){
+var host=$('#cv');
+function fail(m){host.innerHTML='<p class="warn">'+m+'</p>';['play','rep','ar','auto','lab','rl','rr','zi','zo','rv'].forEach(function(i){$('#'+i).disabled=true});
+ $('#info').textContent='Visualisasi 3D tidak tersedia, tetapi LKPD dan kuis tetap dapat digunakan.';}
+if(typeof THREE==='undefined'){fail('Pustaka Three.js gagal dimuat. Periksa koneksi internet, lalu muat ulang halaman.');return}
+var renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});}catch(e){fail('Peramban tidak mendukung WebGL. Coba Chrome atau Firefox terbaru.');return}
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+renderer.xr.enabled=true;
+host.appendChild(renderer.domElement);
+var scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,.05,100);
+var BASEZ=5.2,zoom=BASEZ;cam.position.set(0,0,zoom);
+scene.add(new THREE.AmbientLight(0xffffff,.75));
+var dl=new THREE.DirectionalLight(0xffffff,.9);dl.position.set(3,4,5);scene.add(dl);
+var root=new THREE.Group();scene.add(root);
+function V(x,y,z){return new THREE.Vector3(x,y,z||0)}
+function M(c,o){return new THREE.MeshStandardMaterial({color:c,transparent:o<1,opacity:o==null?1:o,roughness:.55,side:THREE.DoubleSide})}
+function sph(r,c,o,sx,sy,sz,p){var m=new THREE.Mesh(new THREE.SphereGeometry(r,28,20),M(c,o));m.scale.set(sx||1,sy||1,sz||1);if(p)m.position.set(p[0],p[1],p[2]||0);return m}
+function tube(pts,r,c,o){var cu=new THREE.CatmullRomCurve3(pts);return new THREE.Mesh(new THREE.TubeGeometry(cu,Math.max(24,pts.length*4),r,10,false),M(c,o))}
+function box(w,h,d,c,y,o){var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c,o));m.position.y=y;return m}
+
+var organs={},flows=[];
+function mk(key,labels,hook){var g=new THREE.Group();g.visible=false;root.add(g);organs[key]={g:g,labels:labels||[],hook:hook,flows:[]};return g}
+function addFlow(key,path,n,c1,c2,size,opt){
+ var o=organs[key],geo=new THREE.SphereGeometry(size,10,8);
+ for(var i=0;i<n;i++){var m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:c1}));
+  var f={m:m,u:i/n,r:Math.random(),path:path,c1:new THREE.Color(c1),c2:new THREE.Color(c2||c1),opt:opt||{},key:key};o.g.add(m);o.flows.push(f);flows.push(f)}
+}
+function curve(pts){var c=new THREE.CatmullRomCurve3(pts);return function(u){return c.getPoint(Math.min(.999,u))}}
+
+/* --- Ginjal --- */
+(function(){
+var g=mk('ginjal',[['Korteks',[-.7,.85,.2]],['Medula (piramid ginjal)',[-.15,.1,.5]],['Pelvis renalis',[.5,.25,.3]],['Ureter',[.6,-1.2,0]],['Arteri renalis',[1.1,.55,0]]]);
+g.add(sph(1,0xb5483a,.45,.85,1.3,.65));
+for(var i=0;i<6;i++){var a=i/6*Math.PI*2,pos=V(Math.cos(a)*.45-.05,Math.sin(a)*.75,0),d=V(.38,0,0).sub(pos).normalize();
+ var c=new THREE.Mesh(new THREE.ConeGeometry(.2,.6,16),M(0x8a2f2a,.95));c.position.copy(pos);c.quaternion.setFromUnitVectors(V(0,1,0),d);g.add(c)}
+g.add(sph(.2,0xf2c94c,1,1,1.1,1,[.38,0,0]));
+g.add(tube([V(.4,-.15),V(.5,-.5),V(.6,-1.6)],.07,0xf2c94c));
+g.add(tube([V(1.4,.7),V(.9,.45),V(.45,.15)],.06,0xd7263d));
+g.add(tube([V(1.4,.3),V(.9,.15),V(.45,0)],.06,0x3a6ea5));
+addFlow('ginjal',curve([V(.38,0),V(.45,-.4),V(.55,-1.0),V(.6,-1.6)]),10,0xf6e05e,0xf6e05e,.06);
+})();
+
+/* --- Nefron --- */
+var NP,NSEG=[],NB=[];
+(function(){
+var g=mk('nefron',[['Glomerulus',[-1.55,1.45,0]],['Kapsula Bowman',[-1.0,1.05,0]],['Tub. kontortus proksimal',[-.7,.1,0]],['Lengkung Henle',[0,-1.3,0]],['Tub. kontortus distal',[1.05,.95,0]],['Tubulus pengumpul',[1.55,-1.0,0]]]);
+var segs=[
+ [V(-1.4,1.1),V(-1.2,1.0),V(-1.05,.8)],
+ [V(-1.05,.8),V(-.8,.9),V(-.9,.6),V(-.6,.65),V(-.7,.35),V(-.4,.3),V(-.25,-.1)],
+ [V(-.25,-.1),V(-.1,-.9),V(.1,-1.1),V(.35,-.8),V(.55,.2),V(.65,.6)],
+ [V(.65,.6),V(.85,.75),V(.8,.45),V(1.05,.5),V(1.0,.2),V(1.25,.15)],
+ [V(1.25,.15),V(1.35,-.4),V(1.4,-1.4)]];
+var cols=[0xd7263d,0x49a6e8,0x7b61ff,0x34c38f,0xf2a33a],rad=[.06,.1,.08,.09,.11];
+var cs=segs.map(function(p){return new THREE.CatmullRomCurve3(p)}),tot=0,L=cs.map(function(c){return c.getLength()});
+L.forEach(function(l){tot+=l});var acc=0;
+cs.forEach(function(c,i){
+ var mesh=tube(segs[i],rad[i],cols[i],i==0?.95:.85);g.add(mesh);NSEG.push({mesh:mesh,base:new THREE.Color(cols[i])});
+ NB.push(acc/tot);acc+=L[i]});NB.push(1);
+NP=function(u){u=Math.min(.999,u);for(var i=0;i<cs.length;i++){if(u<=NB[i+1]){return cs[i].getPoint((u-NB[i])/(NB[i+1]-NB[i]))}}return cs[4].getPoint(1)};
+var gl=sph(.2,0xd7263d,1,1,1,1,[-1.45,1.25,0]);g.add(gl);
+g.add(sph(.38,0x9be3ff,.28,1,1,1,[-1.3,1.05,0]));
+g.add(tube([V(-1.9,1.9),V(-1.6,1.5),V(-1.45,1.25)],.05,0xd7263d));
+g.add(tube([V(-1.45,1.25),V(-1.2,1.5),V(-1.6,1.9)],.04,0x3a6ea5));
+addFlow('nefron',NP,60,0x7fd3ff,0x7fd3ff,.045,{neph:1});
+})();
+
+/* --- Kulit --- */
+(function(){
+var g=mk('kulit',[['Epidermis',[-1.5,.85,.9]],['Dermis',[-1.5,.3,.9]],['Hipodermis',[-1.5,-.4,.9]],['Kelenjar keringat',[.45,-.15,.3]],['Pori keringat',[.1,1.05,0]],['Keringat',[.2,1.55,0]]]);
+g.add(box(3.2,.3,1.6,0xe7b48a,.85));g.add(box(3.2,.8,1.6,0xd98a8a,.3,.9));g.add(box(3.2,.6,1.6,0xf2d27a,-.4,.9));
+var p=[];for(var i=0;i<56;i++){var a=i*.55;p.push(V(Math.cos(a)*.22,-.5+i*.012+(i%2)*.0,Math.sin(a)*.22))}
+g.add(tube(p,.045,0x8e44ad));
+var path=p.concat([V(.2,.2),V(-.05,.55),V(.1,.9),V(.05,1.0),V(.05,1.6)]);
+g.add(tube(path.slice(p.length-1),.025,0xc39bd3,.8));
+addFlow('kulit',curve(path),16,0xbfe9ff,0xffffff,.05);
+})();
+
+/* --- Paru-paru --- */
+var lungs=[];
+(function(){
+var g=mk('paru',[['Trakea',[0,1.35,0]],['Bronkus',[.45,.55,.2]],['Bronkiolus',[-.5,.1,.5]],['Alveolus',[.9,-.5,.5]],['CO\u2082 + uap air',[0,1.95,0]]]);
+g.add(tube([V(0,1.4),V(0,.7)],.13,0xd9d2c3));
+g.add(tube([V(0,.7),V(.4,.45),V(.75,.1)],.07,0xd9d2c3));g.add(tube([V(0,.7),V(-.4,.45),V(-.75,.1)],.07,0xd9d2c3));
+[1,-1].forEach(function(s){
+ var l=sph(1,0xf08a96,.55,.55,.95,.5,[s*.8,-.1,0]);g.add(l);lungs.push(l);
+ for(var i=0;i<7;i++){g.add(sph(.09,0xc2185b,1,1,1,1,[s*(.7+Math.random()*.3),-.6+Math.random()*.9,(Math.random()-.5)*.4]))}
+ addFlow('paru',curve([V(s*.8,-.5),V(s*.75,-.1),V(s*.4,.45),V(0,.8),V(0,1.4),V(0,2.0)]),9,0x9aa7ad,0x9aa7ad,.06);
+ addFlow('paru',curve([V(s*.85,-.3),V(s*.75,0),V(s*.4,.45),V(0,.8),V(0,1.4),V(0,2.0)]),5,0x8fd3ff,0xffffff,.05);
+});
+})();
+
+/* --- Hati --- */
+(function(){
+var g=mk('hati',[['Lobus kanan',[.6,.6,.5]],['Lobus kiri',[-1.4,.4,.4]],['Kantung empedu',[.5,-.85,.3]],['Vena porta',[-.4,-.1,.6]],['Vena hepatika',[.2,1.35,0]],['Amonia \u2192 urea',[-.9,-.6,.3]]]);
+g.add(sph(1,0x8a3b2a,.6,1.3,.75,.7,[.2,0,0]));g.add(sph(1,0x9c4632,.6,.75,.55,.6,[-1,-.05,0]));
+g.add(sph(.25,0x4caf50,1,.8,1.2,.8,[.5,-.62,.2]));
+g.add(tube([V(.2,.4),V(.2,1.1),V(.2,1.6)],.07,0x3a6ea5));g.add(tube([V(-.9,-.6),V(-.3,-.2),V(.2,.1)],.07,0x7b3fa0));
+addFlow('hati',curve([V(-1.0,-.55),V(-.4,-.2),V(.2,.15),V(.2,.8),V(.2,1.7)]),14,0xf39c12,0x27ae60,.06);
+})();
+
+/* --- label HTML --- */
+var labEls=[],showLab=true;
+function setLabels(){
+ labEls.forEach(function(e){e.remove()});labEls=[];
+ organs[APP.organ].labels.forEach(function(l){var d=document.createElement('div');d.className='lb';d.textContent=l[0];d.style.display='none';$('#stage').appendChild(d);labEls.push(d)});
+}
+var tmp=new THREE.Vector3();
+function updLabels(){
+ var w=host.clientWidth,h=host.clientHeight,ls=organs[APP.organ].labels;
+ labEls.forEach(function(e,i){
+  if(!showLab||renderer.xr.isPresenting){e.style.display='none';return}
+  tmp.set(ls[i][1][0],ls[i][1][1],ls[i][1][2]);root.localToWorld(tmp);tmp.project(cam);
+  e.style.display='block';e.style.left=((tmp.x*.5+.5)*w)+'px';e.style.top=((-tmp.y*.5+.5)*h)+'px'});
+}
+
+/* --- Pilih organ / tahap --- */
+var running=true,speed=1,impaired=false;
+function showOrgan(k){
+ APP.organ=k;if(k!=='nefron')APP.stage=null;
+ for(var o in organs)organs[o].g.visible=(o===k);
+ document.querySelectorAll('#organs button').forEach(function(b){b.classList.toggle('on',b.dataset.o===k)});
+ document.querySelectorAll('#stgbar button').forEach(function(b){b.classList.toggle('on',b.dataset.s===APP.stage)});
+ $('#imp').parentNode.style.display=k==='nefron'?'':'none';
+ setLabels();paintSeg();info();
+}
+function paintSeg(){
+ var hl={filtrasi:[0],reabsorpsi:[1,2,4],sekresi:[3]}[APP.stage];
+ NSEG.forEach(function(s,i){var on=!hl||hl.indexOf(i)>-1;s.mesh.material.emissive.setHex(on&&hl?0x335533:0);s.mesh.material.opacity=on?.9:.25})
+}
+function info(){
+ var d=INFO[APP.organ],s=APP.stage?STG[APP.stage]:null,h='<b>'+d.n+'</b><br><b>Struktur:</b> '+d.s+'<br><b>Fungsi:</b> '+d.f+'<br><b>Zat sisa:</b> '+d.z+'<br><b>Proses:</b> '+d.p;
+ if(s)h+='<hr style="border-color:#2a5d58"><b>Tahap: '+s.t+'</b><br><b>Lokasi:</b> '+s.l+'<br><b>Zat:</b> '+s.z+'<br><b>Hasil:</b> '+s.h;
+ $('#info').innerHTML=h;
+}
+var hcnt=0;
+function hasil(){
+ var o=organs[APP.organ],n=0,tot=0;
+ o.flows.forEach(function(f){tot++;if(f.m.visible)n++});
+ var h='Organ diamati: <b>'+INFO[APP.organ].n+'</b> | Simulasi: <b>'+(running?'berjalan':'dijeda')+'</b> pada <b>'+speed.toFixed(1)+'\u00d7</b> | Label: <b>'+(showLab?'tampil':'tersembunyi')+'</b><br>Partikel terlihat: <b>'+n+' dari '+tot+'</b>';
+ if(APP.organ==='nefron'){
+  var reg=0,rv=0;o.flows.forEach(function(f){if(f.r<.85){reg++;if(f.m.visible&&f.u>NB[4])rv++}});
+  h+='<br>Tahap dipilih: <b>'+(APP.stage?STG[APP.stage].t:'belum ada')+'</b><br>Filtrat mencapai tubulus pengumpul: <b>'+rv+'</b> partikel<br>Perkiraan urine: <b>'+(impaired?'sangat banyak dan encer (glukosa ikut terbuang)':'\u00b11,5 L/hari, pekat normal')+'</b>';
+ }
+ $('#hasil').innerHTML=h;
+}
+document.querySelectorAll('#organs button').forEach(function(b){b.onclick=function(){showOrgan(b.dataset.o)}});
+document.querySelectorAll('#stgbar button').forEach(function(b){b.onclick=function(){APP.stage=b.dataset.s;if(APP.organ!=='nefron')showOrgan('nefron');else{document.querySelectorAll('#stgbar button').forEach(function(x){x.classList.toggle('on',x===b)});paintSeg();info()}}});
+
+/* --- Kontrol --- */
+$('#play').onclick=function(){running=!running;this.textContent=running?'\u23f8 Jeda':'\u25b6 Mulai'};
+$('#rep').onclick=function(){flows.forEach(function(f,i){f.u=(f.opt.neph?(i%60)/60*.0:0)+Math.random()*.0;});flows.forEach(function(f){f.u=0});var k=0;organs[APP.organ].flows.forEach(function(f,i,a){f.u=-(i/a.length)});running=true;$('#play').textContent='\u23f8 Jeda'};
+$('#spd').oninput=function(){speed=+this.value;$('#spv').textContent=speed.toFixed(1)+'\u00d7'};
+$('#imp').onchange=function(){impaired=this.checked};
+var autoR=true;
+$('#auto').onclick=function(){autoR=!autoR;this.classList.toggle('on',autoR)};
+$('#lab').onclick=function(){showLab=!showLab;this.classList.toggle('on',showLab)};
+$('#rl').onclick=function(){root.rotation.y-=.4};$('#rr').onclick=function(){root.rotation.y+=.4};
+$('#zi').onclick=function(){zoom=Math.max(2.2,zoom-.6)};$('#zo').onclick=function(){zoom=Math.min(10,zoom+.6)};
+$('#rv').onclick=function(){root.rotation.set(0,0,0);zoom=BASEZ};
+var ptr={},pd=0;
+var cvs=renderer.domElement;
+cvs.addEventListener('pointerdown',function(e){ptr[e.pointerId]=[e.clientX,e.clientY];cvs.setPointerCapture(e.pointerId)});
+cvs.addEventListener('pointermove',function(e){
+ var p=ptr[e.pointerId];if(!p)return;var ids=Object.keys(ptr);
+ if(ids.length===1){root.rotation.y+=(e.clientX-p[0])*.01;root.rotation.x=Math.max(-1.2,Math.min(1.2,root.rotation.x+(e.clientY-p[1])*.01))}
+ ptr[e.pointerId]=[e.clientX,e.clientY];
+ if(ids.length===2){var a=ptr[ids[0]],b=ptr[ids[1]],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pd)zoom=Math.max(2.2,Math.min(10,zoom-(d-pd)*.02));pd=d}
+});
+function up(e){delete ptr[e.pointerId];pd=0}
+cvs.addEventListener('pointerup',up);cvs.addEventListener('pointercancel',up);
+cvs.addEventListener('wheel',function(e){e.preventDefault();zoom=Math.max(2.2,Math.min(10,zoom+e.deltaY*.005))},{passive:false});
+
+/* --- AR (WebXR) --- */
+var arBtn=$('#ar'),xrs=null;
+if(navigator.xr&&navigator.xr.isSessionSupported){
+ navigator.xr.isSessionSupported('immersive-ar').then(function(ok){
+  if(ok){$('#arm').textContent='Perangkat mendukung AR.'}
+  else{arBtn.disabled=true;$('#arm').textContent='AR tidak didukung perangkat ini. Mode 3D interaktif aktif.'}
+ }).catch(function(){arBtn.disabled=true;$('#arm').textContent='AR tidak tersedia. Mode 3D interaktif aktif.'});
+}else{arBtn.disabled=true;$('#arm').textContent='AR tidak didukung peramban ini. Mode 3D interaktif aktif.'}
+arBtn.onclick=function(){
+ if(xrs){xrs.end();return}
+ var opt={optionalFeatures:['dom-overlay'],domOverlay:{root:$('#arpanel')}};
+ navigator.xr.requestSession('immersive-ar',opt).then(function(s){
+  xrs=s;renderer.xr.setReferenceSpaceType('local');
+  return renderer.xr.setSession(s).then(function(){
+   root.position.set(0,-.1,-1.2);root.scale.setScalar(.28);document.body.classList.add('inar');arBtn.textContent='Keluar AR';
+   s.addEventListener('end',function(){xrs=null;root.position.set(0,0,0);root.scale.setScalar(1);document.body.classList.remove('inar');arBtn.textContent='Mulai AR';resize()});
+  });
+ }).catch(function(e){xrs=null;$('#arm').textContent='AR gagal dimulai ('+(e&&e.name||'galat')+'). Mode 3D tetap aktif.'});
+};
+
+/* --- Loop --- */
+function resize(){if(renderer.xr.isPresenting)return;var w=host.clientWidth||300,h=host.clientHeight||300;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+if(window.ResizeObserver)new ResizeObserver(resize).observe(host);addEventListener('resize',resize);resize();
+var last=performance.now(),tt=0,col=new THREE.Color();
+renderer.setAnimationLoop(function(now){
+ var dt=Math.min(.05,(now-last)/1000);last=now;
+ if(running)tt+=dt;
+ if(!renderer.xr.isPresenting){cam.position.z+=(zoom-cam.position.z)*.15;if(autoR&&running&&!Object.keys(ptr).length)root.rotation.y+=dt*.25}
+ if(organs.paru.g.visible){var s=1+Math.sin(tt*2)*.05;lungs.forEach(function(l){l.scale.set(.55*s,.95*s,.5*s)})}
+ organs[APP.organ].flows.forEach(function(f){
+  if(running)f.u+=dt*speed*.12*(f.opt.neph?1:1.4);
+  if(f.u>1)f.u-=1;
+  if(f.u<0){f.m.visible=false;return}
+  f.m.position.copy(f.path(f.u));f.m.visible=true;var sc=1;
+  col.copy(f.c1).lerp(f.c2,f.u);
+  if(f.opt.neph){
+   var sec=f.r>.85;
+   if(sec){f.m.visible=f.u>NB[3]&&f.u<1;col.setHex(0xffa534);}
+   else if(!impaired&&f.r<.7){var gone=NB[1]+f.r/.7*(NB[3]-NB[1]);if(f.u>gone){sc=Math.max(0,1-(f.u-gone)*12);f.m.visible=sc>.05}}
+   if(f.u<NB[1]&&f.r<.5)col.setHex(0xffd166);
+   if(impaired&&f.u>NB[1])col.setHex(0xfff08a);
+  }
+  f.m.scale.setScalar(sc);f.m.material.color.copy(col);
+ });
+ updLabels();
+ if(now-hcnt>250){hcnt=now;hasil()}
+ renderer.render(scene,cam);
+});
+showOrgan('ginjal');
+})();
+</script>
+</body>
+</html>
